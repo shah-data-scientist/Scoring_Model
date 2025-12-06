@@ -62,6 +62,16 @@ def load_data(data_path: str = 'data',
     >>> print(f"Train shape: {train_df.shape}")
     """
     path = Path(data_path)
+    
+    # Robust path resolution (handle running from root or notebooks dir)
+    if not path.exists():
+        # Try parent directory
+        parent_path = Path('..') / data_path
+        if parent_path.exists():
+            path = parent_path
+            data_path = str(path)  # Update string path for downstream functions
+        else:
+            print(f"⚠️ Warning: Data path '{data_path}' not found.")
 
     print(f"Loading data from: {path.absolute()}\n")
 
