@@ -152,13 +152,78 @@ def apply_undersampling(X: pd.DataFrame, y: pd.Series,
     return X_resampled, y_resampled, metadata
 
 
+from imblearn.pipeline import Pipeline
+
+def apply_smote_undersample(X: pd.DataFrame, y: pd.Series,
+                           random_state: int = 42,
+                           over_strategy: float = 0.1, 
+                           under_strategy: float = 0.5) -> Tuple[pd.DataFrame, pd.Series, Dict]:
+    """
+    Apply SMOTE followed by Random Undersampling.
+    
+    Strategy:
+    1. SMOTE oversamples minority class to 'over_strategy' ratio of majority class.
+    2. RandomUnderSampler undersamples majority class to 'under_strategy' ratio (target/majority).
+    
+    Args:
+        X: Feature DataFrame
+        y: Target Series
+        random_state: Random seed
+        over_strategy: Ratio of minority/majority after SMOTE (e.g. 0.1 to increase minority slightly)
+        under_strategy: Ratio of minority/majority after Undersampling (e.g. 0.5 for 2:1 ratio)
+
+    Returns:
+        Tuple of (X_resampled, y_resampled, metadata dict)
+    """
+    print(f"Applying SMOTE + Undersampling...")
+    print(f"  Original samples: {len(X):,}")
+    print(f"  Original class 0: {(y == 0).sum():,}")
+    print(f"  Original class 1: {(y == 1).sum():,}")
+
+    # Pipeline: SMOTE -> RandomUnderSampler
+    # Note: sampling_strategy in SMOTE controls the ratio of minority to majority AFTER resampling
+    # We want to first boost minority (e.g. to 0.3), then trim majority to match (e.g. to 0.5)
+    
+    # Default behavior if not specified: 
+    # SMOTE to 0.5 (minority becomes half of majority)
+    # Then Undersample to 1.0 (majority becomes equal to minority)
+    
+    over = SMOTE(sampling_strategy=0.5, random_state=random_state)
+    under = RandomUnderSampler(sampling_strategy=1.0, random_state=random_state)
+    
+    steps = [('o', over), ('u', under)]
+    pipeline = Pipeline(steps=steps)
+
+    X_resampled, y_resampled = pipeline.fit_resample(X, y)
+
+    # Convert back to DataFrame/Series
+    X_resampled = pd.DataFrame(X_resampled, columns=X.columns)
+    y_resampled = pd.Series(y_resampled, name=y.name)
+
+    metadata = {
+        'method': 'smote_undersample',
+        'original_samples': len(X),
+        'resampled_samples': len(X_resampled),
+        'minority_class_count': (y_resampled == 1).sum(),
+        'majority_class_count': (y_resampled == 0).sum(),
+        'imbalance_ratio': (y_resampled == 0).sum() / (y_resampled == 1).sum()
+    }
+
+    print(f"  Resampled samples: {len(X_resampled):,}")
+    print(f"  Resampled class 0: {metadata['majority_class_count']:,}")
+    print(f"  Resampled class 1: {metadata['minority_class_count']:,}")
+    print(f"  New imbalance ratio: {metadata['imbalance_ratio']:.2f}:1")
+
+    return X_resampled, y_resampled, metadata
+
+
 def get_sampling_strategy(strategy_name: str, X: pd.DataFrame, y: pd.Series,
                           random_state: int = 42) -> Tuple[pd.DataFrame, pd.Series, Dict]:
     """
     Apply the specified sampling strategy.
 
     Args:
-        strategy_name: 'balanced', 'smote', or 'undersample'
+        strategy_name: 'balanced', 'smote', 'undersample', or 'smote_undersample'
         X: Feature DataFrame
         y: Target Series
         random_state: Random seed
@@ -177,9 +242,11 @@ def get_sampling_strategy(strategy_name: str, X: pd.DataFrame, y: pd.Series,
         return apply_smote(X, y, random_state=random_state)
     elif strategy_name == 'undersample':
         return apply_undersampling(X, y, random_state=random_state)
+    elif strategy_name == 'smote_undersample':
+        return apply_smote_undersample(X, y, random_state=random_state)
     else:
         raise ValueError(f"Unknown sampling strategy: {strategy_name}. "
-                        f"Choose from: balanced, smote, undersample")
+                        f"Choose from: balanced, smote, undersample, smote_undersample")
 
 
 # Strategy descriptions for documentation
@@ -201,6 +268,12 @@ STRATEGY_DESCRIPTIONS = {
         'description': 'Randomly removes majority class samples.',
         'pros': ['Fast', 'Reduces dataset size', 'Simple to understand'],
         'cons': ['Loses information', 'May remove important samples', 'Reduces training data']
+    },
+    'smote_undersample': {
+        'name': 'SMOTE + Undersampling',
+        'description': 'Hybrid approach: SMOTE to increase minority, then undersample majority.',
+        'pros': ['Balances data without massive size increase', 'Cleans decision boundary'],
+        'cons': ['Complex to tune', 'Computationally intensive']
     }
 }
 

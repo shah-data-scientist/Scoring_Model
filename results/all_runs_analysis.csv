@@ -1,0 +1,43 @@
+experiment,run_name,run_id,roc_auc,feature_strategy,sampling_strategy,artifact_count,artifacts,metric_count,status
+credit_scoring_model_selection,LightGBM,bb0c4b07040542c2b80fb0e027f5f8a1,0.7758023053954586,N/A,N/A,0,NONE,3,FINISHED
+credit_scoring_model_selection,XGBoost,520e141313164f1ca119e64156b4446e,0.7557201243369633,N/A,N/A,0,NONE,3,FINISHED
+credit_scoring_model_selection,Random Forest,355ff8c6e73a4116afc63c80f5b87fdd,0.7391408663330339,N/A,N/A,0,NONE,3,FINISHED
+credit_scoring_model_selection,Logistic Regression,0d34427cdd3c4144a8afbe446957e2e0,0.7678888119042352,N/A,N/A,0,NONE,3,FINISHED
+credit_scoring_model_selection,Dummy Classifier,3e9325c8165b4013b9fa8f71b41dadcc,0.5,N/A,N/A,0,NONE,3,FINISHED
+credit_scoring_final_delivery,final_model_application,66a18cf1755e4560a1f0dfeb9e8b5bd8,0.0,N/A,N/A,7,"confusion_matrix.png, feature_importance.csv, feature_importance.png, pr_curve.png, roc_curve.png, submission.csv, train_predictions.csv",1,FINISHED
+credit_scoring_optimization_fbeta,youthful-squid-169,4aa720545ccc432b89b9d4fd300afa02,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,sedate-ray-194,50445c833e884e359e9adce994f85442,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,sincere-doe-805,07a3cf62ab194ef2b428c96fd401dbe0,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,bald-mole-931,71c52b3d51ad490f8338d644a33dfbbf,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,auspicious-squid-818,3928de9739914b68bd67c3132d2b5808,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,abrasive-eel-11,36253333609f4326ade2d63a131e2c43,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,brawny-yak-704,e8fcda191fe4414a98641fdcd3abcd00,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,smiling-turtle-784,b76d5f626a7a4c85a182ee33fe039d47,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,overjoyed-auk-860,f69adb37db9e4755bc347b0487d27f09,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,illustrious-bird-539,a51b33d363c04a509dd7e5a97754f212,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,marvelous-shrike-110,3019767f161b4ddda80bf8d0d15e1ec4,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,intrigued-yak-71,ca1535242f984cea9b0c491630b613af,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,casual-dove-51,e9b63755ef154e3dbb947c60bd9e0bf2,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,monumental-deer-516,34dba502a29f4f86bc172f92ccc51ea2,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,treasured-squid-24,4c7fdb64e85e478e9f9bfc7a9062f035,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,unleashed-deer-710,0280666e29164bd98a3222b00aa58e0e,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,spiffy-whale-113,a070ee170487465e99802cec45ef8f57,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,wistful-frog-965,0ae1af80d51d4eeb968aa546f2eea64d,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,intelligent-doe-54,192e23b371df4ce69ad4bb5f8bc79cb1,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_optimization_fbeta,respected-mink-865,e0b82005c6ea4d54a862d2464b67c5d1,0.0,N/A,N/A,0,NONE,1,FINISHED
+credit_scoring_feature_engineering_cv,exp16_cv_combined_smote_undersample,4072fa2c97b04e41aa9ef6a2a30b9a77,0.7661791957453179,combined,smote_undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp15_cv_combined_undersample,795b489278164835b31a8df120b8c697,0.7704283134676253,combined,undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp14_cv_combined_smote,c9f929057c0e484a8278f7ff475f87ce,0.7610368086235293,combined,smote,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp13_cv_combined_balanced,14e60c2973544dfa864125cbd800a39c,0.7752261820961219,combined,balanced,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp12_cv_polynomial_smote_undersample,69b435b3d8214c4f9b95380b45cbac23,0.7650176521172863,polynomial,smote_undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp11_cv_polynomial_undersample,b6162f1f4c9e4fc1b831cd7e6b2f33eb,0.769782189664802,polynomial,undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp10_cv_polynomial_smote,b7bf3298f7084b0685a2223841e2cb74,0.7579529151412101,polynomial,smote,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp09_cv_polynomial_balanced,4e0f3438df4c4b729d8c325b66da9e1f,0.7745286389810524,polynomial,balanced,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp08_cv_domain_smote_undersample,d3c87583824747f9bd36b4983ef4fc84,0.763934629179811,domain,smote_undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp07_cv_domain_undersample,1a5af468727c47d6a69ad5d3453c9643,0.7716854789060018,domain,undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp06_cv_domain_smote,402435004cb64d48a1fa7e7eae5e0b56,0.7559299311143033,domain,smote,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp05_cv_domain_balanced,081d51d8966a447e88efc37b432f1a26,0.776142049975169,domain,balanced,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp04_cv_baseline_smote_undersample,9540f07a4d404d719444e5f0bc9d444f,0.7641240059851621,baseline,smote_undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp03_cv_baseline_undersample,a64054f8094d46709b48dfcc99aea941,0.7714785589100899,baseline,undersample,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp02_cv_baseline_smote,fd36406be1db4a7ba26c79bcb227bbd9,0.7551652947646857,baseline,smote,0,NONE,12,FINISHED
+credit_scoring_feature_engineering_cv,exp01_cv_baseline_balanced,ff753327fd6547c792e984769f89e575,0.7753695781241036,baseline,balanced,0,NONE,12,FINISHED

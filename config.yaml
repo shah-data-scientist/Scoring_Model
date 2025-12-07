@@ -1,0 +1,45 @@
+project:
+  random_state: 42
+  n_folds: 5
+  n_jobs: -1  # Use -1 for training, restrict for validation if needed
+
+paths:
+  data: "data/processed"
+  models: "models"
+  results: "results"
+  mlruns: "mlruns"
+
+mlflow:
+  tracking_uri: "sqlite:///mlruns/mlflow.db"
+  experiment_names:
+    model_selection: "credit_scoring_model_selection"
+    feature_engineering: "credit_scoring_feature_engineering_cv"
+    optimization: "credit_scoring_optimization_fbeta"
+    final_delivery: "credit_scoring_final_delivery"
+
+business:
+  cost_fn: 10
+  cost_fp: 1
+  f_beta: 3.2  # Derived from sqrt(cost_fn/cost_fp) approx
+
+model:
+  base_lgbm:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    verbose: -1
+  
+  optimization:
+    n_trials: 20
+    search_space:
+      n_estimators: [100, 1000]
+      learning_rate: [0.01, 0.3]
+      num_leaves: [20, 150]
+      max_depth: [3, 12]
+      min_child_samples: [10, 100]
+      subsample: [0.5, 1.0]
+      colsample_bytree: [0.5, 1.0]
+      reg_alpha: [0.0, 10.0]
+      reg_lambda: [0.0, 10.0]

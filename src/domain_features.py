@@ -41,7 +41,7 @@ def create_domain_features(df: pd.DataFrame) -> pd.DataFrame:
     # 2. EMPLOYMENT FEATURES
     if 'DAYS_EMPLOYED' in df.columns:
         # Convert DAYS_EMPLOYED to years (handle anomalies)
-        df['DAYS_EMPLOYED'].replace(365243, np.nan, inplace=True)  # Anomaly in data
+        df['DAYS_EMPLOYED'] = df['DAYS_EMPLOYED'].replace(365243, np.nan)  # Pandas 3.0 compatible
         df['EMPLOYMENT_YEARS'] = -df['DAYS_EMPLOYED'] / 365
         df['EMPLOYMENT_YEARS'] = df['EMPLOYMENT_YEARS'].clip(lower=0)  # No negative
         df['IS_EMPLOYED'] = (df['EMPLOYMENT_YEARS'] > 0).astype(int)
