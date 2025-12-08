@@ -6,7 +6,7 @@ authors = [
     {name = "Shahul SHAIK",email = "shah.data.scientist@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4.0"
 dependencies = [
     "streamlit",
     "scikit-learn",
@@ -22,7 +22,7 @@ dependencies = [
     "httpx (>=0.28.1,<0.29.0)",
     "joblib (>=1.5.2,<2.0.0)",
     "sqlalchemy (>=2.0.44,<3.0.0)",
-    "numpy (>=2.3.4,<3.0.0)",
+    "numpy (>=2.0.0,<3.0.0)",
     "scipy (>=1.16.3,<2.0.0)",
     "seaborn (>=0.13.2,<0.14.0)",
     "python-dotenv (>=1.2.1,<2.0.0)",
@@ -34,6 +34,8 @@ dependencies = [
     "lightgbm (>=4.0.0,<5.0.0)",
     "optuna (>=4.6.0,<5.0.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
+    "evidently (==0.4.33)",
+    "requests (>=2.32.5,<3.0.0)",
 ]
 
 [tool.poetry]

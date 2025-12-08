@@ -24,6 +24,32 @@ from datetime import datetime
 from src.config import MLFLOW_TRACKING_URI, REGISTERED_MODELS
 from src.validation import validate_prediction_probabilities, DataValidationError
 
+import logging
+import json
+import time
+from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
+
+# Configure JSON Logging
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        log_record = {
+            "timestamp": datetime.fromtimestamp(record.created).isoformat(),
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "module": record.module,
+            "funcName": record.funcName,
+        }
+        if record.exc_info:
+            log_record["exception"] = self.formatException(record.exc_info)
+        return json.dumps(log_record)
+
+logger = logging.getLogger("CreditScoringAPI")
+handler = logging.StreamHandler()
+handler.setFormatter(JsonFormatter())
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Credit Scoring API",
@@ -32,6 +58,25 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Middleware for Request Logging
+class RequestLoggerMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        
+        log_data = {
+            "event": "request_processed",
+            "method": request.method,
+            "url": str(request.url),
+            "status_code": response.status_code,
+            "process_time_seconds": round(process_time, 4)
+        }
+        logger.info(json.dumps(log_data))
+        return response
+
+app.add_middleware(RequestLoggerMiddleware)
 
 # Add CORS middleware
 app.add_middleware(
@@ -45,7 +90,7 @@ app.add_middleware(
 # Global variables for model
 model = None
 model_metadata = {}
-EXPECTED_FEATURES = 189  # Update based on your model
+EXPECTED_FEATURES = 194  # Updated to match trained model (was 189)
 
 
 # ============================================================================
@@ -149,7 +194,7 @@ async def load_model():
     """Load ML model on startup."""
     global model, model_metadata
 
-    print("Loading credit scoring model...")
+    logger.info("Loading credit scoring model...")
 
     try:
         # Set MLflow tracking URI
@@ -163,15 +208,15 @@ async def load_model():
             model_uri = f"models:/{model_name}/Production"
             model = mlflow.sklearn.load_model(model_uri)
             model_metadata['stage'] = 'Production'
-            print(f"Loaded model from Production stage: {model_name}")
+            logger.info(f"Loaded model from Production stage: {model_name}")
 
         except mlflow.exceptions.MlflowException:
             # Fall back to Staging
-            print("Production model not found, trying Staging...")
+            logger.warning("Production model not found, trying Staging...")
             model_uri = f"models:/{model_name}/Staging"
             model = mlflow.sklearn.load_model(model_uri)
             model_metadata['stage'] = 'Staging'
-            print(f"Loaded model from Staging stage: {model_name}")
+            logger.info(f"Loaded model from Staging stage: {model_name}")
 
         model_metadata.update({
             'name': model_name,
@@ -179,11 +224,11 @@ async def load_model():
             'loaded_at': datetime.now().isoformat()
         })
 
-        print(f"Model loaded successfully: {model_metadata}")
+        logger.info(f"Model loaded successfully: {model_metadata}")
 
     except Exception as e:
-        print(f"ERROR: Failed to load model: {e}")
-        print("API will start but predictions will fail until model is loaded.")
+        logger.error(f"Failed to load model: {e}", exc_info=True)
+        logger.warning("API will start but predictions will fail until model is loaded.")
         model = None
         model_metadata = {'error': str(e)}
 
@@ -191,7 +236,7 @@ async def load_model():
 @app.on_event("shutdown")
 async def shutdown():
     """Cleanup on shutdown."""
-    print("Shutting down Credit Scoring API...")
+    logger.info("Shutting down Credit Scoring API...")
 
 
 # ============================================================================
@@ -221,6 +266,38 @@ async def health_check():
         timestamp=datetime.now().isoformat()
     )
 
+
+import os
+import pandas as pd
+
+LOGS_DIR = Path("logs")
+LOGS_DIR.mkdir(exist_ok=True)
+LOG_FILE = LOGS_DIR / "production_logs.csv"
+
+def log_prediction_to_csv(features: List[float], prediction: int, probability: float, client_id: Optional[str] = None):
+    """Log prediction data to CSV for drift monitoring."""
+    try:
+        data = {
+            "timestamp": datetime.now().isoformat(),
+            "client_id": client_id,
+            "prediction": prediction,
+            "probability": probability,
+        }
+        # Add features with generic names if names aren't available, 
+        # but ideally we should map them. For now, we assume simple f_0, f_1...
+        # or just store them as a list if we process them later.
+        # Better: flattened columns
+        for i, val in enumerate(features):
+            data[f"feature_{i}"] = val
+            
+        df = pd.DataFrame([data])
+        
+        # Append to CSV
+        header = not LOG_FILE.exists()
+        df.to_csv(LOG_FILE, mode='a', header=header, index=False)
+        
+    except Exception as e:
+        logger.error(f"Failed to log prediction to CSV: {e}")
 
 @app.post(
     "/predict",
@@ -278,6 +355,14 @@ async def predict(input_data: PredictionInput):
             risk_level = "HIGH"
         else:
             risk_level = "CRITICAL"
+            
+        # Log to CSV for monitoring
+        log_prediction_to_csv(
+            input_data.features, 
+            int(prediction), 
+            float(probability), 
+            input_data.client_id
+        )
 
         return PredictionOutput(
             prediction=int(prediction),
@@ -289,6 +374,7 @@ async def predict(input_data: PredictionInput):
         )
 
     except Exception as e:
+        logger.exception("Prediction failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Prediction failed: {str(e)}"

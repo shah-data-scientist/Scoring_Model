@@ -543,6 +543,69 @@ This project is for educational purposes.
 
 ---
 
+## 🚀 Deployment & Monitoring (Project 8 Update)
+
+This project now includes a complete MLOps pipeline for deployment and monitoring.
+
+### 1. API Deployment
+The FastAPI application serves predictions and can process single or batch requests.
+
+**Run locally:**
+```bash
+poetry run uvicorn api.app:app --reload --port 8000
+```
+- API Docs: `http://localhost:8000/docs`
+- Health Check: `http://localhost:8000/health`
+
+### 2. Containerization (Docker)
+The API is containerized for consistent deployment.
+
+**Build Image:**
+```bash
+docker build -t credit-scoring-api:latest .
+```
+
+**Run Container:**
+```bash
+docker run -p 8000:8000 credit-scoring-api:latest
+```
+
+### 3. CI/CD Pipeline
+Automated testing is configured via GitHub Actions (`.github/workflows/main.yml`).
+- **Triggers:** Push to `main` or Pull Requests.
+- **Steps:** Installs dependencies, runs tests (`pytest`), and builds the Docker image.
+
+### 4. Data Drift Monitoring
+We use **Evidently AI** to detect data drift between training data and production logs.
+
+**Generate Drift Report:**
+```bash
+# 1. Ensure API is running and has processed some requests (logged to logs/production_logs.csv)
+# 2. Run monitoring script
+poetry run python scripts/monitor_drift.py
+```
+
+**View Monitoring Dashboard:**
+```bash
+poetry run streamlit run scripts/monitoring_dashboard.py
+```
+
+### 6. Full Stack Deployment (Docker Compose)
+Run the API and PostgreSQL database together:
+
+```bash
+docker-compose up --build -d
+```
+- API: `http://localhost:8000`
+- Database: `postgres:5432`
+
+To shut down:
+```bash
+docker-compose down
+```
+
+---
+
 **Happy Learning! 🚀**
 
 Remember: The goal is not just to build a model, but to understand the entire process, make informed decisions, and communicate your findings effectively.
