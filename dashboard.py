@@ -31,13 +31,55 @@ RESULTS_DIR = Path(CONFIG['paths']['results'])
 
 @st.cache_data
 def load_predictions():
-    """Load cached predictions."""
+    """Load and validate cached predictions."""
     pred_path = RESULTS_DIR / 'train_predictions.csv'
+
+    # Check file exists
     if not pred_path.exists():
-        st.error("Predictions not found. Run scripts/pipeline/apply_best_model.py first.")
+        st.error(f"Predictions file not found: {pred_path}")
+        st.info("Please run the model training pipeline first to generate predictions.")
+        st.code("poetry run python scripts/pipeline/apply_best_model.py", language="bash")
         st.stop()
-    
-    df = pd.read_csv(pred_path)
+
+    # Load data
+    try:
+        df = pd.read_csv(pred_path)
+    except Exception as e:
+        st.error(f"Error loading predictions file: {e}")
+        st.stop()
+
+    # Validate schema
+    required_cols = ['TARGET', 'PROBABILITY']
+    missing_cols = set(required_cols) - set(df.columns)
+    if missing_cols:
+        st.error(f"Predictions file is missing required columns: {missing_cols}")
+        st.info(f"Available columns: {list(df.columns)}")
+        st.stop()
+
+    # Validate data types and ranges
+    try:
+        # Check TARGET is binary
+        if not set(df['TARGET'].unique()).issubset({0, 1}):
+            st.warning(f"TARGET has unexpected values: {df['TARGET'].unique()}")
+
+        # Check PROBABILITY range
+        if (df['PROBABILITY'] < 0).any() or (df['PROBABILITY'] > 1).any():
+            invalid_count = ((df['PROBABILITY'] < 0) | (df['PROBABILITY'] > 1)).sum()
+            st.error(f"PROBABILITY has {invalid_count} values outside [0,1] range")
+            st.stop()
+
+        # Check for NaN
+        if df[required_cols].isna().any().any():
+            nan_counts = df[required_cols].isna().sum()
+            st.error(f"Predictions contain NaN values:\n{nan_counts}")
+            st.stop()
+
+        st.sidebar.success(f"Loaded {len(df):,} predictions")
+
+    except Exception as e:
+        st.error(f"Data validation failed: {e}")
+        st.stop()
+
     return df['TARGET'], df['PROBABILITY']
 
 def plot_confusion_matrix(y_true, y_pred):

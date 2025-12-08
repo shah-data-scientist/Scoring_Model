@@ -22,9 +22,10 @@ warnings.filterwarnings('ignore')
 def load_data(data_path: str = 'data',
               train_file: str = 'application_train.csv',
               test_file: str = 'application_test.csv',
-              use_all_data_sources: bool = True) -> Tuple[pd.DataFrame, pd.DataFrame]:
+              use_all_data_sources: bool = True,
+              validate: bool = True) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Load training and test datasets with optional aggregation from all data sources.
+    Load training and test datasets with comprehensive validation.
 
     Educational Note:
     -----------------
@@ -50,49 +51,124 @@ def load_data(data_path: str = 'data',
         Test data filename
     use_all_data_sources : bool
         If True, load and aggregate all data sources
+    validate : bool
+        If True, run comprehensive data validation
 
     Returns:
     --------
     Tuple[pd.DataFrame, pd.DataFrame]
         Training and test dataframes
 
+    Raises:
+    -------
+    FileNotFoundError : If data files don't exist
+    ValueError : If data validation fails
+
     Example:
     --------
     >>> train_df, test_df = load_data(use_all_data_sources=True)
     >>> print(f"Train shape: {train_df.shape}")
     """
+    from src.validation import (
+        validate_file_exists, validate_dataframe_schema,
+        validate_id_column, validate_target_column
+    )
+
     path = Path(data_path)
-    
-    # Robust path resolution (handle running from root or notebooks dir)
+
+    # Robust path resolution with proper error handling
     if not path.exists():
         # Try parent directory
         parent_path = Path('..') / data_path
         if parent_path.exists():
             path = parent_path
-            data_path = str(path)  # Update string path for downstream functions
+            data_path = str(path)
         else:
-            print(f"⚠️ Warning: Data path '{data_path}' not found.")
+            # Try project root
+            project_root = Path(__file__).parent.parent / data_path
+            if project_root.exists():
+                path = project_root
+                data_path = str(path)
+            else:
+                raise FileNotFoundError(
+                    f"Data directory not found: {data_path}\n"
+                    f"Current working directory: {Path.cwd()}\n"
+                    f"Tried paths:\n"
+                    f"  - {Path(data_path).absolute()}\n"
+                    f"  - {parent_path.absolute()}\n"
+                    f"  - {project_root.absolute()}"
+                )
 
     print(f"Loading data from: {path.absolute()}\n")
 
-    if use_all_data_sources:
-        # Use comprehensive feature aggregation from all data sources
-        from src.feature_aggregation import load_and_aggregate_all_data
-        train_df, test_df = load_and_aggregate_all_data(data_dir=data_path)
-    else:
-        # Load only main application tables
-        train_df = pd.read_csv(path / train_file)
-        test_df = pd.read_csv(path / test_file)
+    try:
+        if use_all_data_sources:
+            # Use comprehensive feature aggregation from all data sources
+            from src.feature_aggregation import load_and_aggregate_all_data
+            train_df, test_df = load_and_aggregate_all_data(data_dir=data_path)
+        else:
+            # Validate files exist
+            train_path = path / train_file
+            test_path = path / test_file
 
-        print(f"✅ Training data loaded: {train_df.shape}")
-        print(f"✅ Test data loaded: {test_df.shape}")
+            if validate:
+                validate_file_exists(train_path, "Training file")
+                validate_file_exists(test_path, "Test file")
 
-    # Basic validation
-    assert 'SK_ID_CURR' in train_df.columns, "Missing ID column in train data"
-    assert 'TARGET' in train_df.columns, "Missing TARGET column in train data"
-    assert train_df['SK_ID_CURR'].is_unique, "Duplicate IDs in train data"
+            # Load only main application tables
+            train_df = pd.read_csv(train_path)
+            test_df = pd.read_csv(test_path)
 
-    print(f"\n[OK] Data validation passed")
+            print(f"[OK] Training data loaded: {train_df.shape}")
+            print(f"[OK] Test data loaded: {test_df.shape}")
+
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Failed to load data: {e}")
+    except pd.errors.EmptyDataError:
+        raise ValueError("Data file is empty")
+    except pd.errors.ParserError as e:
+        raise ValueError(f"Failed to parse CSV file: {e}")
+
+    # Comprehensive validation
+    if validate:
+        print("\nValidating data integrity...")
+
+        # Required columns
+        validate_dataframe_schema(
+            train_df,
+            required_columns=['SK_ID_CURR', 'TARGET'],
+            data_description="Training data"
+        )
+        validate_dataframe_schema(
+            test_df,
+            required_columns=['SK_ID_CURR'],
+            data_description="Test data"
+        )
+
+        # ID column validation
+        validate_id_column(train_df, data_description="Training data")
+        validate_id_column(test_df, data_description="Test data")
+
+        # Target validation (binary classification)
+        validate_target_column(
+            train_df,
+            target_column='TARGET',
+            expected_values=[0, 1],
+            data_description="Training data"
+        )
+
+        # Check for data leakage (no overlap in IDs)
+        train_ids = set(train_df['SK_ID_CURR'])
+        test_ids = set(test_df['SK_ID_CURR'])
+        overlap = train_ids & test_ids
+
+        if overlap:
+            raise ValueError(
+                f"Data leakage detected! {len(overlap)} IDs appear in both train and test sets.\n"
+                f"First 5 overlapping IDs: {list(overlap)[:5]}"
+            )
+
+        print("[OK] Data validation passed")
 
     return train_df, test_df
 

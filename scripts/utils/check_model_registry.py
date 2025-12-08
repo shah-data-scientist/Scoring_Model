@@ -2,7 +2,7 @@ import mlflow
 from mlflow.tracking import MlflowClient
 import os
 
-mlflow.set_tracking_uri("sqlite:///mlruns/mlflow.db")
+mlflow.set_tracking_uri("sqlite:///../../mlruns/mlflow.db")
 client = MlflowClient()
 
 model_name = "credit_scoring_production_model"

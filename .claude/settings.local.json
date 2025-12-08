@@ -1,21 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(for f in:*)",
-      "Bash(do if [ -f \"$f\" ])",
-      "Bash(fi)",
-      "Bash(poetry show:*)",
-      "Bash(poetry run mlflow ui:*)",
-      "Bash(timeout /t 3 /nobreak)",
-      "Bash(netstat:*)",
-      "Bash(taskkill /F /PID 5628)",
-      "Bash(set MLFLOW_TRACKING_URI=sqlite:///notebooks/mlruns/mlflow.db:*)",
-      "Bash(copy \"notebooks\\mlruns\\mlflow.db\" \"mlruns\\mlflow.db\")",
-      "Bash(if exist mlruns echo ROOT: mlruns folder exists)",
-      "Bash(if exist notebooksmlruns echo NOTEBOOKS: notebooksmlruns folder exists)",
-      "Bash(taskkill:*)",
-      "Bash(if exist mlrunsmlflow.db echo ROOT DB EXISTS)",
-      "Bash(if exist notebooksmlrunsmlflow.db echo NOTEBOOKS DB EXISTS)"
+      "Bash(poetry run python:*)",
+      "Bash(poetry run pytest:*)"
     ],
     "deny": [],
     "ask": []

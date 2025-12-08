@@ -1,7 +1,7 @@
 import mlflow
 from mlflow.tracking import MlflowClient
 
-mlflow.set_tracking_uri("sqlite:///mlruns/mlflow.db")
+mlflow.set_tracking_uri("sqlite:///../../mlruns/mlflow.db")
 client = MlflowClient()
 
 exp = client.get_experiment("2")
