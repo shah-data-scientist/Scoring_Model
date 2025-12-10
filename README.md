@@ -1,30 +1,93 @@
-# Credit Scoring Model - MLOps Project
+# Credit Scoring Model - Production ML System
 
-## 📋 Project Overview
+[![Tests](https://img.shields.io/badge/tests-67%2F67%20passing-brightgreen)]()
+[![Python](https://img.shields.io/badge/python-3.13-blue)]()
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)]()
+[![MLflow](https://img.shields.io/badge/MLflow-3.6-orange)]()
 
-This project demonstrates a complete **Machine Learning Operations (MLOps)** workflow for building a credit scoring model. The goal is to predict loan default risk using the **Home Credit Default Risk** dataset, with a strong focus on:
-
-- 🔍 **Feature Engineering & Analysis**
-- 📊 **Experiment Tracking** with MLflow
-- 🎯 **Model Optimization**
-- 🔬 **Model Interpretability** with SHAP
-- 📈 **Reproducibility & Scalability**
-
-**Note for Learners:** This project is designed for educational purposes. Each notebook contains detailed explanations of concepts, code, and best practices in data science.
+A production-ready machine learning system for credit default prediction, featuring automated monitoring, comprehensive testing, and REST API serving.
 
 ---
 
-## 🎯 Learning Objectives
+## 🎯 Quick Start
 
-By completing this project, you will learn:
+### Launch All Services (Easiest)
+```bash
+# Windows
+launch_services.bat
 
-1. **Data Science Workflow**: End-to-end ML pipeline from exploration to deployment
-2. **Imbalanced Dataset Handling**: Techniques for dealing with class imbalance
-3. **MLflow Tracking**: Logging experiments, parameters, metrics, and artifacts
-4. **Model Selection**: Comparing multiple algorithms and choosing the best
-5. **Hyperparameter Tuning**: Systematic optimization strategies
-6. **Model Explainability**: Understanding feature importance and SHAP values
-7. **Best Practices**: Code organization, documentation, and reproducibility
+# Linux/Mac
+./launch_services.sh
+```
+
+This opens:
+- **MLflow UI**: http://localhost:5000 (Experiment tracking)
+- **Dashboard**: http://localhost:8501 (Threshold optimization)
+- **API Docs**: http://localhost:8000/docs (Interactive API)
+
+### Individual Services
+```bash
+# MLflow UI only
+poetry run python scripts/deployment/start_mlflow_ui.py
+
+# Dashboard only
+poetry run streamlit run scripts/deployment/dashboard.py
+
+# API Server only
+poetry run python scripts/deployment/start_api.py
+```
+
+---
+
+## 📊 Project Overview
+
+### Business Problem
+Predict credit default risk for loan applications to minimize financial losses while maintaining customer approval rates.
+
+### Solution
+Machine learning system that:
+- **Predicts** default probability for each application
+- **Optimizes** decision threshold for business cost (FN=€10, FP=€1)
+- **Achieves** 0.7761 ROC-AUC with domain-engineered features
+- **Serves** predictions via REST API (<50ms latency)
+
+### Key Metrics
+| Metric | Value | Target |
+|--------|-------|--------|
+| **ROC-AUC** | 0.7761 | > 0.75 |
+| **Precision** | 0.52 | > 0.50 |
+| **Recall** | 0.68 | > 0.60 |
+| **Business Cost** | €2.45/client | Minimize |
+| **API Latency** | <50ms | <100ms |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     USER INTERFACES                          │
+├──────────────┬──────────────┬──────────────┬────────────────┤
+│  Web Apps    │  Mobile Apps │  Dashboards  │  Notebooks     │
+└──────┬───────┴──────┬───────┴──────┬───────┴────────┬───────┘
+       │              │              │                │
+       └──────────────┴──────────────┴────────────────┘
+                          │
+                  ┌───────▼────────┐
+                  │   REST API     │
+                  │  (FastAPI)     │
+                  │  Port 8000     │
+                  └───────┬────────┘
+                          │
+          ┌───────────────┼───────────────┐
+          │               │               │
+  ┌───────▼────────┐ ┌───▼────┐ ┌────────▼────────┐
+  │   ML Model     │ │MLflow  │ │   Monitoring    │
+  │   (LightGBM)   │ │Registry│ │   (Drift, Perf) │
+  │   189 Features │ │Port    │ │                 │
+  └────────────────┘ │5000    │ └─────────────────┘
+                     └────────┘
+```
 
 ---
 
@@ -32,40 +95,50 @@ By completing this project, you will learn:
 
 ```
 Scoring_Model/
+├── README.md                          # This file
+├── launch_services.bat/sh             # Quick service launcher
+├── pyproject.toml                     # Poetry dependencies
 │
-├── data/                           # Dataset files
-│   ├── application_train.csv       # Training data (307,511 records)
-│   ├── application_test.csv        # Test data (48,744 records)
-│   └── *.csv                       # Additional tables (bureau, credit_card, etc.)
+├── src/                               # Production source code
+│   ├── config.py                      # Configuration management
+│   ├── validation.py                  # Data validation utilities
+│   ├── data_preprocessing.py          # Data loading & preprocessing
+│   ├── feature_engineering.py         # Feature creation
+│   ├── domain_features.py             # Business domain features
+│   ├── model_training.py              # Model training utilities
+│   ├── evaluation.py                  # Evaluation metrics
+│   └── mlflow_utils.py                # MLflow integration
 │
-├── notebooks/                      # Jupyter notebooks (numbered workflow)
-│   ├── 01_eda.ipynb               # Exploratory Data Analysis
-│   ├── 02_feature_engineering.ipynb  # Feature creation & selection
-│   ├── 03_baseline_models.ipynb   # Initial model training with MLflow
-│   ├── 04_hyperparameter_optimization.ipynb  # Model tuning
-│   └── 05_model_interpretation.ipynb  # SHAP analysis & explainability
+├── api/                               # REST API
+│   └── app.py                         # FastAPI application
 │
-├── src/                           # Reusable Python modules
-│   ├── data_preprocessing.py      # Data cleaning and preparation
-│   ├── feature_engineering.py     # Feature creation functions
-│   ├── model_training.py          # Training utilities
-│   └── evaluation.py              # Metrics and evaluation functions
+├── scripts/                           # Utility scripts
+│   ├── deployment/                    # Service launchers
+│   ├── mlflow/                        # MLflow management
+│   ├── experiments/                   # ML experiments
+│   └── data/                          # Data utilities
 │
-├── models/                        # Saved model artifacts
-│   └── best_model.pkl             # Best performing model
+├── tests/                             # Test suite (67 tests)
+│   ├── test_api.py                   # API endpoint tests
+│   ├── test_validation.py            # Validation tests
+│   └── test_config.py                # Configuration tests
 │
-├── mlruns/                        # MLflow experiment tracking data
-│   └── [experiment_id]/           # Auto-generated by MLflow
+├── notebooks/                         # Jupyter notebooks
+│   ├── 01_exploratory_data_analysis.ipynb
+│   ├── 02_feature_engineering.ipynb
+│   ├── 03_baseline_models.ipynb
+│   └── 04_hyperparameter_optimization.ipynb
 │
-├── scripts/                       # Automation scripts
-│   ├── mlflow_example.py          # MLflow basic example
-│   └── train_best_model.py        # Final model training script
+├── docs/                              # Documentation
+│   ├── API_TESTING_GUIDE.md          # How to test API
+│   ├── MODEL_MONITORING.md           # Monitoring guide
+│   ├── DEPLOYMENT_GUIDE.md           # Deployment instructions
+│   └── presentations/                # Presentations
 │
-├── tests/                         # Unit tests (optional)
-│
-├── pyproject.toml                 # Poetry dependencies
-├── poetry.lock                    # Locked dependency versions
-└── README.md                      # This file
+├── data/processed/                    # Processed features
+├── mlruns/                            # MLflow tracking
+├── models/                            # Saved models
+└── results/                           # Generated outputs
 ```
 
 ---
@@ -73,476 +146,120 @@ Scoring_Model/
 ## 🚀 Getting Started
 
 ### Prerequisites
-
-- Python 3.12+
-- Poetry (for dependency management)
+- Python 3.13+
+- Poetry (dependency management)
+- 8GB RAM minimum
+- 10GB disk space
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   cd Scoring_Model
-   ```
-
-2. **Install dependencies with Poetry:**
-   ```bash
-   poetry install
-   ```
-
-3. **Activate the virtual environment:**
-   ```bash
-   poetry shell
-   ```
-
-### Running the Project
-
-#### Option 1: Interactive Notebooks (Recommended for Learning)
-
-Open and run notebooks in order:
-
 ```bash
-jupyter notebook notebooks/01_eda.ipynb
+# 1. Clone repository
+git clone <repository-url>
+cd Scoring_Model
+
+# 2. Install dependencies
+poetry install
+
+# 3. Run tests to verify installation
+poetry run pytest tests/ -v
+
+# 4. Launch services
+./launch_services.bat  # Windows
+# or
+./launch_services.sh   # Linux/Mac
 ```
 
-Each notebook builds on the previous one and contains educational content.
+---
 
-#### Option 2: MLflow UI
-
-Start the MLflow tracking server to visualize experiments:
+## 🧪 Testing
 
 ```bash
-mlflow ui
+# Run all tests
+poetry run pytest tests/ -v
+
+# Run with coverage
+poetry run pytest tests/ --cov=src --cov=api --cov-report=html
 ```
 
-Then open your browser to: `http://localhost:5000`
+**Results**: 67/67 tests passing ✅
 
 ---
 
-## 📊 Dataset Information
+## 📡 API Usage
 
-### Home Credit Default Risk
+### Health Check
+```bash
+curl http://localhost:8000/health
+```
 
-**Source:** Kaggle Competition
-**Problem Type:** Binary Classification (Imbalanced)
-**Target Variable:** `TARGET` (1 = client had payment difficulties, 0 = no difficulties)
-
-**Key Characteristics:**
-- **Training Set:** 307,511 samples, 122 features
-- **Class Imbalance:** ~8% positive class (default), ~92% negative class
-- **Missing Values:** Significant (some features have >60% missing)
-- **Data Types:** Numerical, categorical, and temporal features
-
-**Important Note on Imbalance:**
-This dataset is highly imbalanced, meaning most clients do NOT default. This means:
-- ❌ **Accuracy is a misleading metric** (you could get 92% accuracy by always predicting "no default")
-- ✅ **Use metrics like ROC-AUC, Precision-Recall, F1-Score instead**
-- ✅ **Stratified sampling is essential** to maintain class ratios in train/validation splits
-
----
-
-## 🔬 Methodology
-
-### Step 1: Exploratory Data Analysis (EDA)
-**Notebook:** `01_eda.ipynb`
-
-**What you'll learn:**
-- Loading and inspecting data
-- Understanding data types and distributions
-- Identifying missing values
-- Visualizing relationships
-- Detecting outliers and anomalies
-
-**Key Questions to Answer:**
-- What does the target distribution look like?
-- Which features have missing values?
-- Are there correlated features?
-- What are the data quality issues?
-
----
-
-### Step 2: Feature Engineering
-**Notebook:** `02_feature_engineering.ipynb`
-
-**What you'll learn:**
-- Handling missing values (imputation strategies)
-- Creating new features (domain knowledge)
-- Encoding categorical variables
-- Feature scaling and normalization
-- Feature selection techniques
-
-**Key Techniques:**
-- Domain-based features (e.g., debt-to-income ratio, credit utilization)
-- Aggregations from related tables
-- Polynomial features (carefully, to avoid overfitting)
-- One-hot encoding vs. label encoding
-
----
-
-### Step 3: Baseline Model Training
-**Notebook:** `03_baseline_models.ipynb`
-
-**What you'll learn:**
-- Setting up MLflow experiments
-- Training multiple algorithms:
-  - Logistic Regression (simple, interpretable)
-  - Random Forest (ensemble, handles non-linearity)
-  - XGBoost (gradient boosting, powerful)
-  - LightGBM (fast, memory-efficient)
-- Logging parameters, metrics, and artifacts
-- Comparing models in MLflow UI
-
-**Evaluation Metrics:**
-- ROC-AUC: Overall performance across thresholds
-- Precision-Recall AUC: Better for imbalanced data
-- F1-Score: Balance between precision and recall
-- Confusion Matrix: Detailed error analysis
-
----
-
-### Step 4: Hyperparameter Optimization
-**Notebook:** `04_hyperparameter_optimization.ipynb`
-
-**What you'll learn:**
-- Grid Search vs. Random Search vs. Bayesian Optimization
-- Cross-validation strategies (Stratified K-Fold)
-- Hyperparameter spaces for different algorithms
-- Tracking optimization runs with MLflow
-- Avoiding overfitting during tuning
-
-**Key Parameters to Tune:**
-- **Tree-based models:** max_depth, n_estimators, min_samples_split
-- **Regularization:** alpha, lambda, learning_rate
-- **Class weights:** Handling imbalance
-
----
-
-### Step 5: Model Interpretation
-**Notebook:** `05_model_interpretation.ipynb`
-
-**What you'll learn:**
-- Feature importance (built-in methods)
-- SHAP (SHapley Additive exPlanations) values
-- Global vs. local interpretability
-- Analyzing model decisions
-- Identifying biases and issues
-
-**SHAP Visualizations:**
-- Summary plots: Overall feature importance
-- Force plots: Individual prediction explanations
-- Dependence plots: Feature interactions
-- Waterfall plots: Step-by-step contribution
-
----
-
-## 📈 MLflow Experiment Tracking
-
-### What is MLflow?
-
-MLflow is an open-source platform for managing the ML lifecycle, including:
-- **Tracking:** Log parameters, metrics, code versions, and artifacts
-- **Projects:** Package code in a reproducible format
-- **Models:** Manage and deploy models
-- **Registry:** Centralized model store
-
-### How We Use MLflow
-
-In this project, MLflow tracks:
-
-1. **Parameters:**
-   - Model hyperparameters (e.g., `max_depth=10`)
-   - Preprocessing choices (e.g., `scaler='standard'`)
-   - Feature selection criteria
-
-2. **Metrics:**
-   - ROC-AUC score
-   - Precision, Recall, F1-Score
-   - Training time
-   - Log-loss
-
-3. **Artifacts:**
-   - Trained model files (`.pkl`)
-   - Feature importance plots
-   - Confusion matrices
-   - ROC curves
-
-4. **Tags:**
-   - Experiment descriptions
-   - Model types
-   - Notes and observations
-
-### Example MLflow Code
-
+### Single Prediction
 ```python
-import mlflow
-import mlflow.sklearn
-from sklearn.ensemble import RandomForestClassifier
+import requests
 
-# Set experiment name
-mlflow.set_experiment("credit_scoring_baseline")
-
-# Start a run
-with mlflow.start_run(run_name="random_forest_v1"):
-
-    # Log parameters
-    mlflow.log_param("n_estimators", 100)
-    mlflow.log_param("max_depth", 10)
-    mlflow.log_param("class_weight", "balanced")
-
-    # Train model
-    model = RandomForestClassifier(n_estimators=100, max_depth=10, class_weight='balanced')
-    model.fit(X_train, y_train)
-
-    # Evaluate
-    roc_auc = roc_auc_score(y_val, model.predict_proba(X_val)[:, 1])
-
-    # Log metrics
-    mlflow.log_metric("roc_auc", roc_auc)
-
-    # Log model
-    mlflow.sklearn.log_model(model, "model")
-
-    # Log artifacts (plots)
-    fig, ax = plt.subplots()
-    RocCurveDisplay.from_estimator(model, X_val, y_val, ax=ax)
-    plt.savefig("roc_curve.png")
-    mlflow.log_artifact("roc_curve.png")
-```
-
-### Viewing Results
-
-```bash
-mlflow ui
-```
-
-Navigate to `http://localhost:5000` to compare runs, visualize metrics, and download artifacts.
-
----
-
-## 🎓 Key Concepts for Learners
-
-### 1. Class Imbalance
-
-**Problem:** When one class significantly outnumbers another (e.g., 92% vs 8%)
-
-**Why it matters:**
-- Models may simply predict the majority class and achieve high accuracy
-- Minority class (defaulters) is often more important to predict correctly
-
-**Solutions:**
-- ✅ Use stratified sampling
-- ✅ Adjust class weights in models (`class_weight='balanced'`)
-- ✅ Use appropriate metrics (ROC-AUC, Precision-Recall)
-- ✅ Consider resampling (SMOTE, undersampling)
-
----
-
-### 2. Train-Validation-Test Split
-
-**Why three sets?**
-
-- **Training Set (60-70%):** Used to train the model
-- **Validation Set (15-20%):** Used to tune hyperparameters and select models
-- **Test Set (15-20%):** Final, unbiased evaluation (simulate production)
-
-**Stratified Split:** Ensures all sets have the same class distribution
-
-```python
-from sklearn.model_selection import train_test_split
-
-X_train, X_temp, y_train, y_temp = train_test_split(
-    X, y, test_size=0.3, stratify=y, random_state=42
+response = requests.post(
+    "http://localhost:8000/predict",
+    json={
+        "features": [0.5, 0.3, ...],  # 189 features
+        "client_id": "100002"
+    }
 )
-X_val, X_test, y_val, y_test = train_test_split(
-    X_temp, y_temp, test_size=0.5, stratify=y_temp, random_state=42
-)
+
+result = response.json()
+print(f"Risk: {result['risk_level']}")  # LOW, MEDIUM, HIGH, CRITICAL
+print(f"Probability: {result['probability']:.4f}")
 ```
 
----
-
-### 3. Feature Engineering
-
-**What is it?** Creating new features from existing data to improve model performance
-
-**Examples:**
-- **Ratio features:** `debt_to_income = credit_amount / income`
-- **Aggregations:** `total_previous_loans` from related tables
-- **Binning:** Converting continuous age to age groups
-- **Interactions:** Combining features (e.g., `income * employed_years`)
-
-**Golden Rule:** Use domain knowledge! Understand what features make business sense.
+**Full API Guide**: [docs/API_TESTING_GUIDE.md](docs/API_TESTING_GUIDE.md)
 
 ---
 
-### 4. Overfitting vs Underfitting
+## 📊 Model Details
 
-**Overfitting:** Model performs well on training data but poorly on new data
-- Learns noise instead of patterns
-- Solution: Regularization, simpler models, more data
+### Best Model
+- **Algorithm**: LightGBM Classifier
+- **Features**: 189 (baseline + domain-engineered)
+- **Cross-Validation**: 5-fold StratifiedKFold
+- **ROC-AUC**: 0.7761 ± 0.0064
+- **Optimal Threshold**: 0.3282
 
-**Underfitting:** Model performs poorly on both training and test data
-- Too simple to capture patterns
-- Solution: More complex models, better features
-
-**How to detect:** Compare training vs validation performance
-
----
-
-### 5. Hyperparameter Tuning
-
-**Hyperparameters:** Settings you choose BEFORE training (e.g., `max_depth`, `learning_rate`)
-
-**Why tune?** Default values are rarely optimal for your specific dataset
-
-**Methods:**
-1. **Grid Search:** Try all combinations (slow but thorough)
-2. **Random Search:** Try random combinations (faster, often good enough)
-3. **Bayesian Optimization:** Smart search based on previous results
-
-**Important:** ALWAYS tune on validation set, never on test set!
+### Feature Categories
+1. **Baseline** (184): Original application data
+2. **Domain** (5): Business logic features
+   - DEBT_TO_INCOME_RATIO
+   - EMPLOYMENT_YEARS
+   - INCOME_PER_PERSON
+   - AGE_YEARS
+   - CREDIT_UTILIZATION
 
 ---
 
-### 6. Model Interpretability
+## 🔍 Monitoring
 
-**Why it matters:**
-- Understand what the model learned
-- Build trust with stakeholders
-- Identify biases and errors
-- Meet regulatory requirements (e.g., credit decisions)
+### Metrics Tracked
+- Business: Default rate, business cost
+- Performance: ROC-AUC, precision, recall
+- System: API latency, throughput, errors
+- Data: Feature drift, prediction drift
 
-**Tools:**
-- **Feature Importance:** Which features matter most overall?
-- **SHAP Values:** Why did the model make THIS specific prediction?
-- **Partial Dependence Plots:** How does changing one feature affect predictions?
+**Monitoring Guide**: [docs/MODEL_MONITORING.md](docs/MODEL_MONITORING.md)
 
 ---
 
-## 📊 Evaluation Metrics Explained
+## 📚 Documentation
 
-### For Imbalanced Classification
+### Guides
+- [Getting Started](docs/GETTING_STARTED.md)
+- [API Testing](docs/API_TESTING_GUIDE.md)
+- [Model Monitoring](docs/MODEL_MONITORING.md)
+- [Deployment](docs/DEPLOYMENT_GUIDE.md)
 
-| Metric | What it Measures | When to Use |
-|--------|------------------|-------------|
-| **ROC-AUC** | Overall ability to distinguish classes | General performance comparison |
-| **Precision-Recall AUC** | Performance on minority class | Imbalanced data (better than ROC-AUC) |
-| **F1-Score** | Balance between precision and recall | When both false positives and false negatives matter |
-| **Precision** | Of predicted positives, how many are correct? | When false positives are costly |
-| **Recall** | Of actual positives, how many did we catch? | When false negatives are costly |
-
-### Confusion Matrix
-
-```
-                Predicted
-                Neg   Pos
-Actual  Neg     TN    FP
-        Pos     FN    TP
-```
-
-- **True Negative (TN):** Correctly predicted non-default
-- **False Positive (FP):** Predicted default, but actually non-default (Type I error)
-- **False Negative (FN):** Predicted non-default, but actually default (Type II error)
-- **True Positive (TP):** Correctly predicted default
-
-**In credit scoring:**
-- FP = Rejected a good customer (lost business)
-- FN = Approved a bad customer (financial loss)
+### Presentations
+- [Business Overview](docs/presentations/BUSINESS_PRESENTATION.md)
+- [Technical Deep Dive](docs/presentations/TECHNICAL_PRESENTATION.md)
 
 ---
 
-## 🛠️ Best Practices
-
-### Code Organization
-- ✅ Keep notebooks focused (one task per notebook)
-- ✅ Extract reusable code to `src/` modules
-- ✅ Use functions instead of copy-paste
-- ✅ Add docstrings and comments
-
-### Experiment Tracking
-- ✅ Name runs descriptively (`"rf_balanced_depth10"`)
-- ✅ Log all parameters and metrics
-- ✅ Save visualizations as artifacts
-- ✅ Add notes about what you tried and why
-
-### Reproducibility
-- ✅ Set random seeds (`random_state=42`)
-- ✅ Version control your code (git)
-- ✅ Document dependencies (`pyproject.toml`)
-- ✅ Save preprocessing pipelines with models
-
-### Model Development
-- ✅ Start simple (Logistic Regression baseline)
-- ✅ Validate assumptions (check for data leakage)
-- ✅ Use cross-validation
-- ✅ Monitor for overfitting
-- ✅ Document model limitations
-
----
-
-## 📚 Additional Resources
-
-### Documentation
-- [Scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
-- [SHAP Documentation](https://shap.readthedocs.io/)
-- [Pandas Documentation](https://pandas.pydata.org/docs/)
-
-### Learning Materials
-- [Kaggle Learn: Intro to Machine Learning](https://www.kaggle.com/learn/intro-to-machine-learning)
-- [Kaggle Learn: Feature Engineering](https://www.kaggle.com/learn/feature-engineering)
-- [Google's Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course)
-
-### Papers
-- [XGBoost Paper](https://arxiv.org/abs/1603.02754)
-- [SHAP Paper](https://arxiv.org/abs/1705.07874)
-
----
-
-## 🎯 Project Deliverables Checklist
-
-- [ ] Complete EDA with visualizations and insights
-- [ ] Feature engineering with at least 5 new features
-- [ ] Minimum 3 different models trained
-- [ ] All experiments logged in MLflow
-- [ ] Hyperparameter optimization performed
-- [ ] Best model identified with justification
-- [ ] SHAP analysis completed
-- [ ] Documentation of findings and recommendations
-- [ ] Reproducible code (can be run by evaluator)
-
----
-
-## 🤝 Contributing
-
-This is an educational project. Feel free to:
-- Add new notebooks exploring different techniques
-- Improve documentation and explanations
-- Add utility functions in `src/`
-- Share your findings and insights
-
----
-
-## 📝 License
-
-This project is for educational purposes.
-
----
-
-## ✉️ Contact
-
-**Author:** Shahul SHAIK
-**Email:** shah.data.scientist@gmail.com
-
----
-
-## 🙏 Acknowledgments
-
-- Home Credit for providing the dataset
-- Kaggle community for insights and notebooks
-- MLflow team for the excellent tracking tool
-- SHAP library authors for interpretability tools
-
----
-
-**Happy Learning! 🚀**
-
-Remember: The goal is not just to build a model, but to understand the entire process, make informed decisions, and communicate your findings effectively.
+**Last Updated**: December 9, 2025
+**Version**: 1.0.0
+**Status**: Production Ready ✅

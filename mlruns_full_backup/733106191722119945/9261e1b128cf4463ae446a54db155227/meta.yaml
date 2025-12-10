@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/shahu/OPEN%20CLASSROOMS/PROJET%206/Scoring_Model/mlruns/733106191722119945/9261e1b128cf4463ae446a54db155227/artifacts
+end_time: 1765266702647
+entry_point_name: ''
+experiment_id: '733106191722119945'
+lifecycle_stage: active
+run_id: 9261e1b128cf4463ae446a54db155227
+run_name: test_model_run
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1765266679403
+status: 3
+tags: []
+user_id: shahu

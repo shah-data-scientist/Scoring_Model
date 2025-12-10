@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(poetry run python:*)",
-      "Bash(poetry run pytest:*)"
+      "Bash(poetry run pytest:*)",
+      "Bash(tree:*)",
+      "Bash(if [ -f \"check_exp.py\" ])",
+      "Bash(then rm check_exp.py)",
+      "Bash(fi)",
+      "Bash(if [ -f \"check_model_registry.py\" ])",
+      "Bash(then rm check_model_registry.py)",
+      "Bash(if [ -f \"delete_model.py\" ])",
+      "Bash(then rm delete_model.py)",
+      "Bash(if [ -f \"list_models.py\" ])",
+      "Bash(then rm list_models.py)",
+      "Bash(chmod:*)",
+      "Bash(dir:*)",
+      "Bash(find:*)",
+      "Bash(poetry run mlflow ui:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

@@ -16,8 +16,9 @@ from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_
 from sklearn.model_selection import cross_val_predict, StratifiedKFold
 import sys
 
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent))
+# Add project root to path (go up 2 levels from scripts/deployment/)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.domain_features import create_domain_features
 from src.config import CONFIG
@@ -27,7 +28,7 @@ st.set_page_config(page_title="Credit Scoring Model Dashboard", layout="wide")
 RANDOM_STATE = CONFIG['project']['random_state']
 BETA = CONFIG['business']['f_beta']
 N_FOLDS = CONFIG['project']['n_folds']
-RESULTS_DIR = Path(CONFIG['paths']['results'])
+RESULTS_DIR = PROJECT_ROOT / CONFIG['paths']['results']
 
 @st.cache_data
 def load_predictions():
@@ -41,9 +42,16 @@ def load_predictions():
         st.code("poetry run python scripts/pipeline/apply_best_model.py", language="bash")
         st.stop()
 
-    # Load data
+    # Load data with optimization for large files
     try:
-        df = pd.read_csv(pred_path)
+        # Only load required columns to reduce memory usage
+        df = pd.read_csv(pred_path, usecols=['TARGET', 'PROBABILITY'])
+
+        # Sample if file is very large (>100k rows) for faster dashboard performance
+        if len(df) > 100000:
+            st.sidebar.warning(f"Large dataset detected ({len(df):,} rows). Using 100k sample for dashboard.")
+            df = df.sample(n=100000, random_state=42)
+
     except Exception as e:
         st.error(f"Error loading predictions file: {e}")
         st.stop()
