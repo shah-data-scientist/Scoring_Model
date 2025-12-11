@@ -17,7 +17,11 @@
       "Bash(dir:*)",
       "Bash(find:*)",
       "Bash(poetry run mlflow ui:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(while read dir)",
+      "Bash(done)",
+      "Bash(netstat:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

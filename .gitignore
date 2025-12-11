@@ -50,3 +50,7 @@ Thumbs.db
 mlflow_stderr.txt
 mlflow_stdout.txt
 nul
+
+api_stderr.txt
+
+api_stdout.txt
