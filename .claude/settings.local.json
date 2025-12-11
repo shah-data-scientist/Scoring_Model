@@ -21,7 +21,8 @@
       "Bash(while read dir)",
       "Bash(done)",
       "Bash(netstat:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

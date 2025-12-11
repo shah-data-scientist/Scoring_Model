@@ -9,25 +9,17 @@ import os
 
 def load_config(config_path="config.yaml"):
     """Load configuration from YAML file."""
-    # Handle path relative to root or src
-    path = Path(config_path)
-    if not path.exists():
-        # Try checking root if we are in src/ or scripts/
-        # Assuming src/config.py -> root is ../
-        root_path = Path(__file__).parent.parent / config_path
-        if root_path.exists():
-            path = root_path
-        else:
-            # Try walking up
-            current = Path.cwd()
-            while current != current.parent:
-                if (current / config_path).exists():
-                    path = current / config_path
-                    break
-                current = current.parent
+    # Robustly find project root relative to this file (src/config.py)
+    # src/config.py -> parent = src -> parent = Project Root
+    project_root = Path(__file__).resolve().parent.parent
+    path = project_root / config_path
     
     if not path.exists():
-        raise FileNotFoundError(f"Config file {config_path} not found.")
+        # Fallback to CWD
+        path = Path.cwd() / config_path
+
+    if not path.exists():
+        raise FileNotFoundError(f"Config file not found. Searched at:\n1. {project_root / config_path}\n2. {Path.cwd() / config_path}")
 
     with open(path, "r") as f:
         config = yaml.safe_load(f)
@@ -35,24 +27,9 @@ def load_config(config_path="config.yaml"):
     return config
 
 # Singleton config object
-try:
-    CONFIG = load_config()
-except FileNotFoundError:
-    print("Warning: Config file not found. Using default configuration.")
-    CONFIG = {}
-except yaml.YAMLError as e:
-    print(f"Error: Config file is malformed: {e}")
-    print("Using default configuration.")
-    CONFIG = {}
-except PermissionError:
-    print("Error: Permission denied reading config file.")
-    print("Using default configuration.")
-    CONFIG = {}
-except Exception as e:
-    # Catch any other unexpected errors
-    print(f"Unexpected error loading config: {e}")
-    print("Using default configuration.")
-    CONFIG = {}
+# We remove the try-except block that masks errors. 
+# The application requires configuration to run; strictly failing is better than silently failing.
+CONFIG = load_config()
 
 # Helper accessors
 def get_data_path():

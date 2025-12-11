@@ -1,0 +1,35 @@
+# OneDrive ignore file
+# Prevents these folders/files from syncing to OneDrive
+
+# Virtual environment (30,000+ files)
+.venv/
+
+# Python cache directories
+__pycache__/
+*.pyc
+*.pyo
+
+# Pytest cache
+.pytest_cache/
+
+# MLflow runs (can be large)
+mlruns/
+mlruns_full_backup/
+
+# Large data/model directories
+data/
+models/
+artifacts/
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+api_stderr.txt
+api_stdout.txt
+mlflow_stderr.txt
+mlflow_stdout.txt
