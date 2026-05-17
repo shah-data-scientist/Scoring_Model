@@ -289,13 +289,11 @@ def validate_no_constant_features(
     constant_features = []
 
     for col in df.columns:
-        if df[col].dtype in ['object', 'category']:
-            # For categorical, check most common value frequency
+        if pd.api.types.is_object_dtype(df[col]) or pd.api.types.is_categorical_dtype(df[col]):
             most_common_freq = df[col].value_counts(normalize=True).iloc[0]
             if most_common_freq >= threshold:
                 constant_features.append(col)
-        else:
-            # For numeric, check if std is near zero
+        elif pd.api.types.is_numeric_dtype(df[col]):
             if df[col].std() < 1e-10:
                 constant_features.append(col)
 

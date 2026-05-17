@@ -14,9 +14,6 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-import warnings
-
-warnings.filterwarnings('ignore')
 
 
 def load_data(data_path: str = 'data',
@@ -337,7 +334,7 @@ def handle_missing_values(df: pd.DataFrame,
             try:
                 if df_copy[feature].dtype in ['int64', 'float64']:
                     constant_val = float(constant_val)
-            except:
+            except (ValueError, TypeError):
                 pass
             df_copy[feature].fillna(constant_val, inplace=True)
             print(f"✅ Imputed {feature} with constant: {constant_val}")

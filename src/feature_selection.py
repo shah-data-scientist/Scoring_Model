@@ -8,6 +8,7 @@ and reduce dimensionality.
 import pandas as pd
 import numpy as np
 from sklearn.feature_selection import VarianceThreshold
+from typing import Tuple
 
 
 def select_features(
@@ -15,7 +16,7 @@ def select_features(
     X_test: pd.DataFrame,
     variance_threshold: float = 0.01,
     correlation_threshold: float = 0.95,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Perform feature selection using variance threshold and correlation.
 

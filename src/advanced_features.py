@@ -16,9 +16,6 @@ Key Principles:
 
 import pandas as pd
 import numpy as np
-from typing import List, Tuple
-import warnings
-warnings.filterwarnings('ignore')
 
 
 def create_advanced_ext_source_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -62,7 +59,8 @@ def create_advanced_ext_source_features(df: pd.DataFrame) -> pd.DataFrame:
         # Weighted combinations (based on typical importance)
         if 'EXT_SOURCE_2' in available and 'EXT_SOURCE_3' in available:
             # EXT_SOURCE_2 and 3 are usually most important
-            df['EXT_SOURCE_WEIGHTED'] = (0.1 * df.get('EXT_SOURCE_1', 0) +
+            ext1 = df['EXT_SOURCE_1'].fillna(0) if 'EXT_SOURCE_1' in available else pd.Series(0, index=df.index)
+            df['EXT_SOURCE_WEIGHTED'] = (0.1 * ext1 +
                                          0.5 * df['EXT_SOURCE_2'] +
                                          0.4 * df['EXT_SOURCE_3'])
 
@@ -194,7 +192,10 @@ def create_credit_behavior_features(df: pd.DataFrame) -> pd.DataFrame:
     if 'AMT_INCOME_TOTAL' in df.columns:
         df['INCOME_LOG'] = np.log1p(df['AMT_INCOME_TOTAL'])
         df['INCOME_SQRT'] = np.sqrt(df['AMT_INCOME_TOTAL'])
-        df['INCOME_PER_FAMILY_MEMBER'] = df['AMT_INCOME_TOTAL'] / (df.get('CNT_FAM_MEMBERS', 1) + 1e-5)
+        if 'CNT_FAM_MEMBERS' in df.columns:
+            df['INCOME_PER_FAMILY_MEMBER'] = df['AMT_INCOME_TOTAL'] / (df['CNT_FAM_MEMBERS'] + 1e-5)
+        else:
+            df['INCOME_PER_FAMILY_MEMBER'] = df['AMT_INCOME_TOTAL'] / 1.00001
 
         # Income groups
         df['INCOME_GROUP'] = pd.cut(df['AMT_INCOME_TOTAL'],
