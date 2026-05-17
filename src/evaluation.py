@@ -14,13 +14,10 @@ import seaborn as sns
 from sklearn.metrics import (
     roc_auc_score, roc_curve, auc,
     precision_recall_curve, average_precision_score,
-    confusion_matrix, classification_report,
-    f1_score, precision_score, recall_score, accuracy_score
+    confusion_matrix,
+    f1_score, precision_score, recall_score, accuracy_score,
 )
-from typing import Dict, Tuple, Optional
-import warnings
-
-warnings.filterwarnings('ignore')
+from typing import Dict, Optional
 
 
 def evaluate_model(y_true: np.ndarray,

@@ -7,7 +7,7 @@ schema validation, and quality checks throughout the ML pipeline.
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import warnings
 
 
@@ -311,7 +311,7 @@ def validate_no_constant_features(
 def validate_data_quality_summary(
     df: pd.DataFrame,
     data_description: str = "DataFrame"
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Comprehensive data quality check and summary.
 

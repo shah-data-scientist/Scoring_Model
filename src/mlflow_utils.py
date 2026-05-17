@@ -204,7 +204,7 @@ def log_dataframe_artifact(df: pd.DataFrame, model_name: str, artifact_type: str
     Path('data').mkdir(exist_ok=True)
 
     # Get standardized path
-    artifact_path = get_artifact_path(model_name, artifact_type, extension='csv')
+    artifact_path = get_artifact_path(model_name, artifact_type) + '.csv'
 
     # Save DataFrame
     df.to_csv(artifact_path, index=False)

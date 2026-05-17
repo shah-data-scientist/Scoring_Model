@@ -61,8 +61,6 @@ def create_domain_features(df: pd.DataFrame) -> pd.DataFrame:
     if 'AMT_CREDIT' in df.columns and 'AMT_GOODS_PRICE' in df.columns:
         # Credit to goods price ratio
         df['CREDIT_TO_GOODS_RATIO'] = df['AMT_CREDIT'] / (df['AMT_GOODS_PRICE'] + 1e-5)
-        # Credit utilization
-        df['CREDIT_UTILIZATION'] = df['AMT_CREDIT'] / (df['AMT_GOODS_PRICE'] + 1e-5)
 
     if 'AMT_ANNUITY' in df.columns and 'AMT_INCOME_TOTAL' in df.columns:
         # Annuity to income ratio (payment burden)

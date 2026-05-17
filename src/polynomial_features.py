@@ -106,8 +106,16 @@ def create_polynomial_features(df: pd.DataFrame,
     # Extract selected features
     X_poly = df[feature_list].copy()
 
-    # Handle missing values (polynomial features can't handle NaN)
-    # Fill with median for now
+    # Fill NaN before polynomial expansion (required; NaN propagates through products)
+    nan_count = X_poly.isnull().sum().sum()
+    if nan_count > 0:
+        import warnings
+        warnings.warn(
+            f"Filling {nan_count} NaN values with column medians before "
+            "polynomial expansion. Impute upstream to suppress this warning.",
+            UserWarning,
+            stacklevel=2,
+        )
     X_poly = X_poly.fillna(X_poly.median())
 
     # Create polynomial features

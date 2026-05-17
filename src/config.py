@@ -3,9 +3,10 @@ Configuration Loader
 
 Loads project configuration from config.yaml.
 """
-import yaml
+import warnings
 from pathlib import Path
-import os
+
+import yaml
 
 def load_config(config_path="config.yaml"):
     """Load configuration from YAML file."""
@@ -26,10 +27,19 @@ def load_config(config_path="config.yaml"):
         
     return config
 
-# Singleton config object
-# We remove the try-except block that masks errors. 
-# The application requires configuration to run; strictly failing is better than silently failing.
-CONFIG = load_config()
+# Singleton config object — loaded lazily to avoid crashing on import when
+# config.yaml is absent (e.g. test environments or notebooks run outside the
+# project root).  Helper accessors below return safe defaults when CONFIG is {}.
+try:
+    CONFIG = load_config()
+except FileNotFoundError:
+    warnings.warn(
+        "config.yaml not found — using built-in defaults. "
+        "Run from the project root to load full configuration.",
+        RuntimeWarning,
+        stacklevel=1,
+    )
+    CONFIG = {}
 
 # Helper accessors
 def get_data_path():

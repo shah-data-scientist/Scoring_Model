@@ -13,7 +13,7 @@ Educational Notes are included throughout to explain concepts!
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import Tuple, List, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -453,7 +453,7 @@ def detect_outliers(df: pd.DataFrame,
     return summary_df
 
 
-def validate_data_quality(df: pd.DataFrame, target_col: str = 'TARGET') -> Dict[str, any]:
+def validate_data_quality(df: pd.DataFrame, target_col: str = 'TARGET') -> Dict[str, Any]:
     """
     Comprehensive data quality validation.
 
@@ -476,7 +476,7 @@ def validate_data_quality(df: pd.DataFrame, target_col: str = 'TARGET') -> Dict[
 
     Returns:
     --------
-    Dict[str, any]
+    Dict[str, Any]
         Dictionary with validation results
 
     Example:
