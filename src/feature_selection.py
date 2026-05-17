@@ -9,10 +9,13 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_selection import VarianceThreshold
 
-def select_features(X_train: pd.DataFrame, 
-                    X_test: pd.DataFrame, 
-                    variance_threshold: float = 0.01, 
-                    correlation_threshold: float = 0.95) -> pd.DataFrame:
+
+def select_features(
+    X_train: pd.DataFrame,
+    X_test: pd.DataFrame,
+    variance_threshold: float = 0.01,
+    correlation_threshold: float = 0.95,
+) -> pd.DataFrame:
     """
     Perform feature selection using variance threshold and correlation.
 
@@ -46,19 +49,30 @@ def select_features(X_train: pd.DataFrame,
     X_test = X_test[X_test.columns[selector.get_support()]]
 
     # 2. Remove highly correlated features
-    print(f"\n2. Removing highly correlated features (>{{correlation_threshold}})...")
+    print(
+        f"\n2. Removing highly correlated features "
+        f"(>{correlation_threshold})..."
+    )
     corr_matrix = X_train.corr().abs()
     upper_triangle = corr_matrix.where(
         np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
     )
 
-    highly_corr_features = [column for column in upper_triangle.columns
-                            if any(upper_triangle[column] > correlation_threshold)]
-    print(f"   Found {len(highly_corr_features)} highly correlated features to remove")
+    # Sort columns so the same feature is always dropped regardless of
+    # DataFrame column ordering or pandas version.
+    sorted_cols = sorted(upper_triangle.columns)
+    highly_corr_features = [
+        col for col in sorted_cols
+        if any(upper_triangle[col] > correlation_threshold)
+    ]
+    print(
+        f"   Found {len(highly_corr_features)} highly correlated "
+        "features to remove"
+    )
 
     X_train = X_train.drop(columns=highly_corr_features)
     X_test = X_test.drop(columns=highly_corr_features)
 
     print(f"\nFeatures after selection: {X_train.shape[1]}")
-    
+
     return X_train, X_test

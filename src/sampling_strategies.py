@@ -301,7 +301,8 @@ if __name__ == "__main__":
     print("=" * 80)
 
     # Create sample imbalanced data
-    np.random.seed(42)
+    RANDOM_STATE = 42
+    np.random.seed(RANDOM_STATE)
     n_samples = 1000
     n_features = 10
 
