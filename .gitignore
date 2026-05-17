@@ -40,6 +40,7 @@ mlruns/
 **/mlruns/
 mlflow.db
 **/mlflow.db
+mlruns_full_backup/
 
 # IDEs
 .idea/
@@ -52,10 +53,8 @@ Thumbs.db
 
 # Logs
 *.log
-mlflow_stderr.txt
-mlflow_stdout.txt
+*.txt
 nul
 
-api_stderr.txt
-
-api_stdout.txt
+# Project brief (large PDFs, not source code)
+project_brief/

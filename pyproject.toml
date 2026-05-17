@@ -6,7 +6,7 @@ authors = [
     {name = "Shahul SHAIK",email = "shah.data.scientist@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "streamlit",
     "scikit-learn",
@@ -57,7 +57,7 @@ nbformat = "^5.10.4"
 
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py311"
 select = ["E", "F", "W", "I", "N", "D", "UP", "ANN", "ASYNC", "B", "C4", "DTZ", "ERA", "FA", "ISC", "ICN", "PIE", "PT", "RSE", "RET", "SIM", "TID", "ARG", "PERF", "PTH", "PL"]
 ignore = ["D100", "D104", "D105", "D107", "ANN101", "ANN002", "ANN003", "ANN201", "ANN204", "ANN401"] # Ignore missing docstrings and some type hints for now
 
@@ -67,7 +67,7 @@ ignore = ["D100", "D104", "D105", "D107", "ANN101", "ANN002", "ANN003", "ANN201"
 "utils.py" = ["ANN401"] # Allow dynamically typed expressions in utility functions
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 strict = true
 ignore_missing_imports = true
 exclude = ["venv/", ".venv/", "tests/", "htmlcov/", "__pycache__/", "outputs/", "data/", "Project Inputs/", "api/app/"]
