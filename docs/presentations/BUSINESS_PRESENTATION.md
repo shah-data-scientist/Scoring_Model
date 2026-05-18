@@ -2,7 +2,7 @@
 ## Business Presentation
 
 **For**: Executive Leadership, Business Stakeholders, Product Management
-**Date**: December 9, 2025
+**Date**: May 18, 2026
 **Presented by**: Data Science Team
 
 ---
@@ -17,17 +17,17 @@
 
 ### The Solution
 **AI-powered credit scoring system** that:
-- ✅ **Predicts default risk** with 78% accuracy (ROC-AUC)
-- ✅ **Reduces business cost** by 32% vs baseline
+- ✅ **Predicts default risk** with 83% accuracy (ROC-AUC)
+- ✅ **Reduces business cost** by 47% vs baseline
 - ✅ **Provides real-time decisions** in <50ms
 - ✅ **Explains predictions** for regulatory compliance
 
 ### Business Impact
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| **Default Detection** | 45% | 68% | +51% |
-| **False Positives** | 55% | 48% | -13% |
-| **Business Cost** | €3.62/client | €2.45/client | **-32%** |
+| **Default Detection** | 0% | 71% | +71pp |
+| **False Positives** | 0% | 21% | — |
+| **Business Cost** | €0.81/client | €0.43/client | **-47%** |
 | **Decision Time** | Hours | <50ms | **Real-time** |
 
 ---
@@ -66,7 +66,7 @@ Time: <50ms    |    Consistency: 100%    |    Scalability: Unlimited
 #### Key Features
 1. **Real-Time Scoring**: <50ms response time
 2. **Consistent Decisions**: Same rules applied to everyone
-3. **Optimized Threshold**: Minimizes business cost (FN=€10, FP=€1)
+3. **Optimised Threshold**: Minimises business cost (FN=€10, FP=€1)
 4. **Explainable**: Shows top factors influencing decision
 5. **Monitored**: Automatic alerts for model drift/degradation
 
@@ -75,21 +75,21 @@ Time: <50ms    |    Consistency: 100%    |    Scalability: Unlimited
 ## 3. How It Works (Non-Technical)
 
 ### Step 1: Data Collection
-We analyze **189 factors** about each applicant:
+We analyse **189 factors** about each applicant:
 - **Basic Info**: Age, employment history, income
-- **Credit History**: Previous loans, payment behavior
-- **Financial Ratios**: Debt-to-income, credit utilization
+- **Credit History**: Previous loans, payment behaviour
+- **Financial Ratios**: Debt-to-income, credit utilisation
 - **External Data**: Credit bureau scores
 
 ### Step 2: Risk Prediction
 Machine learning model calculates **default probability**:
-- **0-20%**: Low Risk → ✅ Auto-Approve
-- **20-40%**: Medium Risk → 🟡 Review
-- **40-60%**: High Risk → 🟠 Senior Review
-- **60-100%**: Critical Risk → ❌ Auto-Reject
+- **0-10%**: Low Risk → ✅ Auto-Approve
+- **10-20%**: Medium Risk → 🟡 Review
+- **20-40%**: High Risk → 🟠 Senior Review
+- **40-100%**: Critical Risk → ❌ Auto-Reject
 
-### Step 3: Business Optimization
-System recommends **optimal decision threshold** (32.82%):
+### Step 3: Business Optimisation
+System recommends **optimal decision threshold** (10%):
 - **Above threshold**: Reject (risk too high)
 - **Below threshold**: Approve (acceptable risk)
 - **Threshold adjustable**: Based on business strategy
@@ -100,16 +100,16 @@ System recommends **optimal decision threshold** (32.82%):
 
 ### Financial Impact (Annual, Based on 100K Applications)
 
-#### Current System (Manual Review)
-- **Defaults**: 8,000 loans × €10,000 average = **€80M losses**
+#### No AI System (Approve Everyone)
+- **Defaults**: 8,070 loans × €10,000 average = **€80.7M losses**
 - **Operational Cost**: 10 analysts × €50K = **€500K**
-- **Total Cost**: **€80.5M**
+- **Total Cost**: **€81.2M**
 
-#### With AI System
-- **Defaults**: 5,440 loans × €10,000 average = **€54.4M losses** (-32%)
-- **False Positives**: 3,200 lost customers × €100 opportunity = €320K
+#### With AI System (threshold = 10%)
+- **Defaults**: 2,340 loans × €10,000 average = **€23.4M losses** (-71%)
+- **False Positives**: 19,246 lost customers × €100 opportunity = **€1.9M**
 - **Operational Cost**: 3 analysts × €50K + €100K ML = **€250K**
-- **Total Cost**: **€55M** → **€25.5M saved annually**
+- **Total Cost**: **€25.55M** → **€55.6M saved annually**
 
 ### Non-Financial Benefits
 1. **Customer Experience**: Instant decisions (was 2-5 days)
@@ -122,24 +122,34 @@ System recommends **optimal decision threshold** (32.82%):
 
 ## 5. Model Performance
 
-### Key Metric: ROC-AUC Score = 0.7761
-**Translation**: Model correctly ranks risky customers above safe customers **78% of the time**
+### Key Metric: ROC-AUC Score = 0.8320
+**Translation**: Model correctly ranks risky customers above safe customers **83% of the time**
 
-### Business Metrics at Optimal Threshold (32.82%)
+### Business Metrics at Optimal Threshold (10%)
 
 | Metric | Value | What It Means |
 |--------|-------|---------------|
-| **Precision** | 52% | Of loans we reject, 52% would have defaulted |
-| **Recall** | 68% | We catch 68% of all defaults |
-| **False Negatives** | 2,560 | Defaults we miss (€25.6M cost) |
-| **False Positives** | 3,200 | Good customers rejected (€320K opportunity cost) |
-| **Total Business Cost** | **€2.45/client** | vs €3.62 baseline |
+| **Precision** | 23% | Of loans we reject, 23% would have defaulted |
+| **Recall** | 71% | We catch 71% of all defaults |
+| **False Negatives** | 2,340 | Defaults we miss (€23.4M cost) |
+| **False Positives** | 19,246 | Good customers rejected (€1.9M opportunity cost) |
+| **Total Business Cost** | **€0.43/client** | vs €0.81 baseline (-47%) |
 
 ### Why Not 100% Accuracy?
 - **Real-world constraints**: No perfect predictor exists
 - **Trade-off**: Catching more defaults → Rejecting more good customers
-- **78% accuracy** is industry-leading performance
-- **Continuous improvement**: Model retrains as new data arrives
+- **83% accuracy** is strong industry performance
+- **Threshold adjustable**: Dashboard shows impact of moving threshold
+
+### Threshold Sensitivity (100K Applications)
+
+| Threshold | Defaults Caught | Good Customers Rejected | Annual Cost |
+|-----------|----------------|------------------------|-------------|
+| 5% | 89% | 45% | €9.5M |
+| **10%** | **71%** | **21%** | **€25.6M ← Optimal** |
+| 15% | 55% | 11% | €36.5M |
+| 20% | 42% | 6% | €44.4M |
+| 50% | 6% | 0% | €74.8M |
 
 ---
 
@@ -148,9 +158,9 @@ System recommends **optimal decision threshold** (32.82%):
 ### What Could Go Wrong?
 
 #### Risk 1: Model Degradation
-- **What**: Performance drops over time as customer behavior changes
+- **What**: Performance drops over time as customer behaviour changes
 - **Mitigation**: Automated monitoring with weekly alerts
-- **Trigger**: ROC-AUC < 0.70 → Retrain model
+- **Trigger**: ROC-AUC < 0.75 → Retrain model
 
 #### Risk 2: Data Drift
 - **What**: Customer profile changes (e.g., younger demographic)
@@ -179,14 +189,14 @@ System recommends **optimal decision threshold** (32.82%):
 
 ### Phase 2: Assisted Review (Month 3-4)
 - ✅ Analysts see model scores
-- ✅ Use scores to prioritize reviews
+- ✅ Use scores to prioritise reviews
 - ✅ Override allowed (with reason logged)
 - **Faster decisions**, analyst oversight
 
 ### Phase 3: Auto-Approval (Month 5-6)
-- ✅ Low-risk applications (<20%) auto-approved
-- ✅ High-risk applications (>60%) auto-rejected
-- ✅ Middle-risk (20-60%) → Manual review
+- ✅ Low-risk applications (<10%) auto-approved
+- ✅ High-risk applications (>40%) auto-rejected
+- ✅ Middle-risk (10-40%) → Manual review
 - **50% automation rate**
 
 ### Phase 4: Full Automation (Month 7+)
@@ -200,7 +210,7 @@ System recommends **optimal decision threshold** (32.82%):
 ## 8. Success Metrics
 
 ### Month 3 Targets (Assisted Review)
-- ✅ Model ROC-AUC > 0.75
+- ✅ Model ROC-AUC > 0.80
 - ✅ Default rate < 7% (vs 8% baseline)
 - ✅ Review time reduced by 30%
 - ✅ Analyst satisfaction > 4/5
@@ -209,12 +219,12 @@ System recommends **optimal decision threshold** (32.82%):
 - ✅ 50% applications auto-decided
 - ✅ Default rate < 6.5%
 - ✅ Customer satisfaction > 4.5/5
-- ✅ €10M annualized savings
+- ✅ €10M annualised savings
 
 ### Month 12 Targets (Full Automation)
 - ✅ 80% applications auto-decided
-- ✅ Default rate < 6%
-- ✅ €25M annualized savings
+- ✅ Default rate < 5%
+- ✅ €55M annualised savings
 - ✅ No regulatory compliance issues
 
 ---
@@ -234,9 +244,9 @@ System recommends **optimal decision threshold** (32.82%):
 - **Total**: **€200K/year**
 
 ### Return on Investment
-- **Savings**: €25.5M/year
+- **Savings**: €55.6M/year
 - **Costs**: €230K one-time + €200K/year
-- **ROI**: **11,200%** (first year)
+- **ROI**: **25,300%** (first year)
 - **Payback Period**: **< 1 month**
 
 ---
@@ -253,7 +263,7 @@ System recommends **optimal decision threshold** (32.82%):
 2. **Scale**: Handle 10x applications without hiring
 3. **Consistency**: No human bias/variance
 4. **24/7 Availability**: Online applications anytime
-5. **Data-Driven**: Continuous optimization
+5. **Data-Driven**: Continuous optimisation
 
 ---
 
@@ -263,7 +273,7 @@ System recommends **optimal decision threshold** (32.82%):
 - ✅ Consent obtained for data processing
 - ✅ Right to explanation (SHAP values)
 - ✅ Right to human review (override process)
-- ✅ Data minimization (only necessary features)
+- ✅ Data minimisation (only necessary features)
 
 ### Fair Lending
 - ✅ No protected characteristics used (race, gender, religion)
@@ -310,7 +320,7 @@ System recommends **optimal decision threshold** (32.82%):
 **A**: Automatic monitoring triggers retraining if performance degrades. Typically every 6-12 months, or on-demand.
 
 ### Q: Can we adjust risk appetite (be more/less conservative)?
-**A**: Yes! Threshold adjustable in real-time. Dashboard shows impact: +5% threshold → -10% defaults, +15% rejections.
+**A**: Yes! Threshold adjustable in real-time. Dashboard shows impact: lower threshold → catch more defaults, reject more good customers.
 
 ### Q: What about data security?
 **A**: Bank-grade encryption, SOC 2 compliant infrastructure, no data leaves secure environment, annual audits.
@@ -329,9 +339,9 @@ System recommends **optimal decision threshold** (32.82%):
 - **Month 2**: Results review → Phase 2 decision
 
 ### Expected Outcome
-- **Month 3**: €2M savings demonstrated
-- **Month 6**: €10M savings annualized
-- **Month 12**: €25M savings, 80% automation
+- **Month 3**: €5M savings demonstrated
+- **Month 6**: €20M savings annualised
+- **Month 12**: €55M savings, 80% automation
 
 ---
 
@@ -363,4 +373,4 @@ Email: tech@company.com
 **Next Review**: Weekly (Tuesdays 10am)
 **Escalation**: tech-leadership@company.com
 
-**Last Updated**: December 9, 2025
+**Last Updated**: May 18, 2026
