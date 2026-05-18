@@ -34,6 +34,7 @@ def train_and_evaluate_model(
     y_train: pd.Series,
     X_val: pd.DataFrame,
     y_val: pd.Series,
+    log_model_artifact: bool = False,
 ) -> Tuple[Dict[str, float], Any]:
     """
     Train a model and log everything to MLflow.
@@ -50,6 +51,9 @@ def train_and_evaluate_model(
         Training data
     X_val, y_val :
         Validation data
+    log_model_artifact : bool, default False
+        Whether to serialize and log the model to the MLflow artifact store.
+        Skip for baseline/exploratory runs; set True only for the final model.
 
     Returns:
     --------
@@ -121,7 +125,8 @@ def train_and_evaluate_model(
             plt.close()
             print("[OK] Feature importance plot saved")
 
-        mlflow.sklearn.log_model(model, "model")
+        if log_model_artifact:
+            mlflow.sklearn.log_model(model, "model")
 
         print("[OK] All metrics and artifacts logged to MLflow")
         print(f"Run ID: {run.info.run_id}")
