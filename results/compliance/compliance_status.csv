@@ -1,0 +1,6 @@
+article,status,finding,audit_date,model_version
+Art 9 — Risk Management,COMPLIANT,Bias testing performed across 13 demographic groups and 4 sensitive attributes. Residual risk (gender DIR=0.612) documented with rationale.,2026-05-19,3
+Art 10 — Data Governance,FINDING,"Gender DIR=0.612 < 0.80 (EEOC rule). Disparity is base-rate-driven (male true DR ~10%, female ~7%). Calibration bias < 0.002. Requires Art 14 human oversight for borderline cases.",2026-05-19,3
+Art 13 — Transparency,COMPLIANT,Model Card (docs/compliance/MODEL_CARD.md) produced. Conformity Assessment (docs/compliance/EU_AI_ACT_CONFORMITY_ASSESSMENT.md) produced. Individual predictions explainable via SHAP force plots (NB05).,2026-05-19,3
+Art 14 — Human Oversight,COMPLIANT,"Threshold=0.10 produces an advisory score, not a binding decision. Loan officers have explicit override authority. Borderline range 0.08-0.15 recommended for mandatory human review.",2026-05-19,3
+Art 15 — Accuracy & Robustness,COMPLIANT,ROC-AUC=0.8320 (threshold: 0.75). Recall=71.01% @ t=0.10. Brier=0.06165. Business cost -47% vs baseline. Monitoring plan documented in docs/MODEL_MONITORING.md.,2026-05-19,3
